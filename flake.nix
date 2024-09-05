@@ -24,17 +24,29 @@
         lisp-cli = lisp.buildASDFSystem {
           inherit pname version src lispLibs;
         };
+
+        runtime = pkgs.sbcl.withPackages (ps: [ ps.woo lisp-cli ]);
+
+        runner = pkgs.writeScriptBin "runner"
+          ''
+            #! ${runtime}/bin/sbcl --script
+            (load (sb-ext:posix-getenv "ASDF"))
+            (asdf:load-system 'woo)
+            (asdf:load-system 'lisp-cli)
+
+            (lisp-cli:main)
+          '';
       in
       {
         formatter = treefmtEval.config.build.wrapper;
 
         packages = {
-          inherit lisp-cli;
-          default = lisp-cli;
+          inherit lisp-cli runner;
+          default = runner;
         };
 
         checks = {
-          inherit lisp-cli;
+          inherit lisp-cli runtime runner;
           formatting = treefmtEval.config.build.check self;
         };
 
