@@ -31,7 +31,7 @@
           ''
             #! ${runtime}/bin/sbcl --script
             (load (sb-ext:posix-getenv "ASDF"))
-            (asdf:load-system 'woo)
+            (asdf:load-system 'clingon)
             (asdf:load-system 'lisp-cli)
 
             (lisp-cli:main)
