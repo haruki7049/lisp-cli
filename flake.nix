@@ -25,7 +25,7 @@
           inherit pname version src lispLibs;
         };
 
-        runtime = pkgs.sbcl.withPackages (ps: [ ps.woo lisp-cli ]);
+        runtime = pkgs.sbcl.withPackages (ps: [ ps.clingon lisp-cli ]);
 
         runner = pkgs.writeScriptBin "runner"
           ''
