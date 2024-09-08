@@ -5,8 +5,16 @@
     treefmt-nix.url = "github:numtide/treefmt-nix";
   };
 
-  outputs = { self, nixpkgs, flake-utils, treefmt-nix, ... }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      treefmt-nix,
+      ...
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
         pkgs = import nixpkgs { inherit system; };
         lib = pkgs.lib;
@@ -22,20 +30,27 @@
         ];
 
         lisp-cli = lisp.buildASDFSystem {
-          inherit pname version src lispLibs;
+          inherit
+            pname
+            version
+            src
+            lispLibs
+            ;
         };
 
-        runtime = pkgs.sbcl.withPackages (ps: [ ps.clingon lisp-cli ]);
+        runtime = pkgs.sbcl.withPackages (ps: [
+          ps.clingon
+          lisp-cli
+        ]);
 
-        runner = pkgs.writeScriptBin "runner"
-          ''
-            #! ${runtime}/bin/sbcl --script
-            (load (sb-ext:posix-getenv "ASDF"))
-            (asdf:load-system 'clingon)
-            (asdf:load-system 'lisp-cli)
+        runner = pkgs.writeScriptBin "runner" ''
+          #! ${runtime}/bin/sbcl --script
+          (load (sb-ext:posix-getenv "ASDF"))
+          (asdf:load-system 'clingon)
+          (asdf:load-system 'lisp-cli)
 
-            (lisp-cli:main)
-          '';
+          (lisp-cli:main)
+        '';
       in
       {
         formatter = treefmtEval.config.build.wrapper;
@@ -63,5 +78,6 @@
             export PS1="\n[nix-shell:\w]$ "
           '';
         };
-      });
+      }
+    );
 }
